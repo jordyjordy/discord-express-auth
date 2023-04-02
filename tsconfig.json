@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "esModuleInterop": true,
+      "target": "ESNext",
+      "module": "CommonJS",
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "outDir": "dist",
+      "strictNullChecks": true,
+      "skipLibCheck": true
+    },
+    "lib": ["es2016"],
+    "files": ["src/index.ts", "index.d.ts"],
+    "include": ["src/**/*", "__mocks__"],
+    "exclude": ["node_modules/**"]
+  }
