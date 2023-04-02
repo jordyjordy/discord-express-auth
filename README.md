@@ -15,7 +15,7 @@ DiscordAuth.configure({
 
 Then several things can be done
 
-An authorization code can be retrieved (this is  an endpoint
+An authorization code can be retrieved (this is  an endpoint)
 
 ```javascript
 app.get('/authorize', DiscordAuth.authorize);
@@ -50,6 +50,8 @@ Identifying a user based on a jwt token (this is middleware) which will give acc
 
 ```javascript
 router.get('/id', DiscordAuth.identify, async (req: ISessionAuthRequest, res: Response) => {
+  ...
+}
 ```
 ---
 

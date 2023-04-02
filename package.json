@@ -1,6 +1,6 @@
 {
   "name": "@thepineappledev/discord-express-auth",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A basic package to use discord oauth2 to authenticate users in express",
   "main": "dist/index.js",
   "scripts": {
@@ -11,6 +11,10 @@
     "build": "npx tsc --p ./tsconfig.build.json",
     "start": "tsc && node dist/index.js",
     "deploy": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jordyjordy/discord-express-auth.git"
   },
   "author": "J. van der Tang",
   "license": "ISC",
