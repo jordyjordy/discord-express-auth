@@ -34,10 +34,15 @@ export default class DiscordAuth {
     static #scope: string;
 
     static configure(options: IDiscordAuthOptions): void {
-        this.#clientId = options.clientId;
-        this.#clientSecret = options.clientSecret;
-        this.#tokenSecret = options.tokenSecret;
-        this.#scope = options.scope;
+        DiscordAuth.#clientId = options.clientId;
+        DiscordAuth.#clientSecret = options.clientSecret;
+        DiscordAuth.#tokenSecret = options.tokenSecret;
+        DiscordAuth.#scope = options.scope;
+        DiscordAuth.authorize = DiscordAuth.authorize.bind(DiscordAuth);
+        DiscordAuth.authCodeToJwtToken = DiscordAuth.authCodeToJwtToken.bind(DiscordAuth);
+        DiscordAuth.reAuth = DiscordAuth.reAuth.bind(DiscordAuth);
+        DiscordAuth.identify = DiscordAuth.identify.bind(DiscordAuth);
+        DiscordAuth.logout = DiscordAuth.logout.bind(DiscordAuth);
     }
 
     static async authorize(
@@ -49,9 +54,9 @@ export default class DiscordAuth {
             return;
         }
         const urlSearchParams = {
-            client_id: this.#clientId,
+            client_id: DiscordAuth.#clientId,
             response_type: 'code',
-            scope: this.#scope,
+            scope: DiscordAuth.#scope,
             redirect_uri: req.query.redirect_uri as string,
         };
 
@@ -75,12 +80,12 @@ export default class DiscordAuth {
         }
     
         const urlSearchParams = {
-            client_id: this.#clientId,
-            client_secret: this.#clientSecret,
+            client_id: DiscordAuth.#clientId,
+            client_secret: DiscordAuth.#clientSecret,
             code: code.toString(),
             grant_type: 'authorization_code',
             redirect_uri: redirect_uri as string,
-            scope: this.#scope,
+            scope: DiscordAuth.#scope,
         };
     
         const tokenResponseData = await axios({
@@ -111,7 +116,7 @@ export default class DiscordAuth {
                 userId: userData.data.id,
                 username: userData.data.username,
             },
-            this.#tokenSecret, {expiresIn: '93d'},
+            DiscordAuth.#tokenSecret, {expiresIn: '93d'},
         );
         res.cookie('access_token', token, { maxAge: 86400000 * 93,  path: "/", httpOnly: false ,secure: true, sameSite: 'none' });
         res.sendStatus(204);
@@ -133,11 +138,11 @@ export default class DiscordAuth {
             return;
         }
         const urlSearchParams = {
-            client_id: this.#clientId as string,
-            client_secret: this.#clientSecret as string,
+            client_id: DiscordAuth.#clientId as string,
+            client_secret: DiscordAuth.#clientSecret as string,
             grant_type: 'refresh_token',
             refresh_token: sessionDetails?.refresh_token,
-            scope: this.#scope,
+            scope: DiscordAuth.#scope,
         };
         try {
             const tokenResponseData = await axios({
@@ -153,7 +158,7 @@ export default class DiscordAuth {
                 res.sendStatus(401);
             }
             const data: ISessionDetails = tokenResponseData.data;
-            const token = jwt.sign({ ...data, userId: sessionDetails.userId, username: sessionDetails.username }, this.#tokenSecret, {expiresIn: '90d'});
+            const token = jwt.sign({ ...data, userId: sessionDetails.userId, username: sessionDetails.username }, DiscordAuth.#tokenSecret, {expiresIn: '90d'});
             res.cookie('access_token', token, { maxAge: 86400000 * 93,  path: "/", httpOnly: false ,secure: true, sameSite: 'none' });
         } catch {
             res.sendStatus(401);
@@ -169,7 +174,7 @@ export default class DiscordAuth {
         try {
             //check if a token exists
             if (sessionId) {
-                const test = jwt.verify(sessionId, this.#tokenSecret);
+                const test = jwt.verify(sessionId, DiscordAuth.#tokenSecret);
                 if(!test) {
                     throw new Error("token invalid or expired");
                 }
@@ -191,10 +196,10 @@ export default class DiscordAuth {
         try {
             //check if a token exists
             if (sessionId) {
-                const tokenData = jwt.verify(sessionId, this.#tokenSecret) as ISessionDetails;
+                const tokenData = jwt.verify(sessionId, DiscordAuth.#tokenSecret) as ISessionDetails;
                 const urlParameters = {
-                    client_id: this.#clientId,
-                    client_secret: this.#clientSecret,
+                    client_id: DiscordAuth.#clientId,
+                    client_secret: DiscordAuth.#clientSecret,
 
                 };
                 const resetToken = axios({
